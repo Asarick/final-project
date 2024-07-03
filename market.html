@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,78 +15,97 @@
             flex-direction: column;
             min-height: 100vh;
         }
+
         .navbar {
             background-color: #4caf50;
         }
-        .navbar-brand, .nav-link {
+
+        .navbar-brand,
+        .nav-link {
             color: white !important;
         }
+
         .main-content {
             flex: 1;
             padding-top: 60px;
         }
+
         .container {
             max-width: 1000px;
             margin-top: 30px;
         }
+
         .card {
             border: none;
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
         }
+
         .card:hover {
             transform: translateY(-5px);
         }
+
         .card-header {
             background-color: #4caf50;
             color: white;
             border-top-left-radius: 15px;
             border-top-right-radius: 15px;
         }
+
         .btn-success {
             background-color: #4caf50;
             border: none;
         }
+
         .btn-success:hover {
             background-color: #45a049;
         }
+
         .product-image {
             max-height: 200px;
             object-fit: cover;
         }
+
         .bid-form {
             background-color: #f1f8e9;
             border-radius: 15px;
             padding: 1rem;
         }
+
         footer {
             background-color: #4caf50;
             color: white;
             padding: 20px 0;
             margin-top: 30px;
         }
+
         .footer-heading {
             font-size: 1.2em;
             margin-bottom: 10px;
         }
+
         .footer-content {
             font-size: 0.9em;
         }
+
         .social-icons {
             font-size: 1.5em;
         }
+
         .social-icons a {
             color: white;
             margin-right: 10px;
         }
     </style>
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">AgriConnect</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -104,6 +124,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="contact.html">Contact Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="manage.html">Account</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
@@ -215,7 +238,8 @@
             <div class="row">
                 <div class="col-md-4">
                     <h5 class="footer-heading">About AgriConnect</h5>
-                    <p class="footer-content">Empowering farmers with technology, market access, and financial security since 2024.</p>
+                    <p class="footer-content">Empowering farmers with technology, market access, and financial security
+                        since 2024.</p>
                 </div>
                 <div class="col-md-4">
                     <h5 class="footer-heading">Quick Links</h5>
@@ -327,7 +351,7 @@
         }
 
         // Event listener for adding a new product
-        document.getElementById("addProductForm").addEventListener("submit", function(e) {
+        document.getElementById("addProductForm").addEventListener("submit", function (e) {
             e.preventDefault();
             const newProduct = {
                 id: products.length + 1,
@@ -344,44 +368,92 @@
         });
 
         // Event listener for booking market space
-        document.getElementById("bookMarketForm").addEventListener("submit", function(e) {
+        document.getElementById("bookMarketForm").addEventListener("submit", function (e) {
             e.preventDefault();
-            const booking = {
-                marketId: document.getElementById("selectedMarket").value,
-                date: document.getElementById("sellingDate").value,
-                requirements: document.getElementById("specialRequirements").value
+            const selectedMarket = document.getElementById("selectedMarket").value;
+            const sellingDate = document.getElementById("sellingDate").value;
+            const specialRequirements = document.getElementById("specialRequirements").value;
+
+            // Create a new market booking object
+            const marketBooking = {
+                marketId: selectedMarket,
+                marketName: document.getElementById("selectedMarket").options[document.getElementById("selectedMarket").selectedIndex].text,
+                sellingDate: sellingDate,
+                specialRequirements: specialRequirements,
+                bookingDate: new Date().toISOString()
             };
-            // Here you would typically send this booking to a server
-            console.log("Market space booked:", booking);
+
+            // Get existing bookings or initialize an empty array
+            const existingBookings = JSON.parse(localStorage.getItem('marketBookings')) || [];
+
+            // Add the new booking
+            existingBookings.push(marketBooking);
+
+            // Save updated bookings to local storage
+            localStorage.setItem('marketBookings', JSON.stringify(existingBookings));
+
+            console.log("Market booked:", marketBooking);
             alert("Market space booked successfully!");
             this.reset();
         });
 
-        // Function to get greeting based on time of day
-        function getGreeting() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-            const userName = currentUser.name || 'Farmer';
+        // Function to populate market bookings table
+        function populateMarketBookingsTable() {
+            const marketBookings = JSON.parse(localStorage.getItem('marketBookings')) || [];
+            const tableBody = document.querySelector('#marketBookingsTable tbody');
+            tableBody.innerHTML = '';
+            marketBookings.forEach(booking => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+            <td>${booking.marketName}</td>
+            <td>${booking.sellingDate}</td>
+            <td>${booking.specialRequirements}</td>
+            <td>${new Date(booking.bookingDate).toLocaleString()}</td>
+        `;
+            });
+        }
+
+        // Update the DOMContentLoaded event listener to include the new function
+        document.addEventListener('DOMContentLoaded', function () {
+            populateForm();
+            populateInsuranceTable();
+            populateMarketBookingsTable(); // Add this line
+            document.getElementById('accountForm').addEventListener('submit', handleFormSubmit);
+        });
+
+        // Function to update greeting based on time of day
+        function updateGreeting() {
+            const greeting = document.getElementById("greeting");
             const hour = new Date().getHours();
-            if (hour < 12) return `Good morning, ${userName}!`;
-            if (hour < 18) return `Good afternoon, ${userName}!`;
-            return `Good evening, ${userName}!`;
+            let greetingText;
+            if (hour < 12) greetingText = "Good morning";
+            else if (hour < 18) greetingText = "Good afternoon";
+            else greetingText = "Good evening";
+            greeting.textContent = `${greetingText}, Farmer!`;
         }
 
         // Function to update date and time
         function updateDateTime() {
+            const dateTimeElement = document.getElementById("datetime");
             const now = new Date();
-            document.getElementById('datetime').textContent = now.toLocaleString();
+            dateTimeElement.textContent = now.toLocaleString();
         }
 
-        // Initial render and setup
-        renderProducts();
-        renderAvailableMarkets();
-        updateMarketOptions();
 
-        // Set initial greeting and start updating date/time
-        document.getElementById('greeting').textContent = getGreeting();
-        updateDateTime();
-        setInterval(updateDateTime, 1000);
+
+        // Initialize page
+        function init() {
+            renderProducts();
+            renderAvailableMarkets();
+            updateMarketOptions();
+            updateGreeting();
+            updateDateTime();
+            setInterval(updateDateTime, 1000); // Update time every second
+        }
+
+        // Call init when the page loads
+        window.onload = init;
     </script>
 </body>
+
 </html>

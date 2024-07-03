@@ -100,6 +100,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="contact.html">Contact Us</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="manage.html">Account</a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav">
                     <li class="nav-item">
@@ -263,15 +266,49 @@
             const totalPremium = basePremium * parseInt(acreage);
 
             // Display insurance details
+            // const insuranceDetails = document.getElementById('insuranceDetails');
+            // insuranceDetails.innerHTML = `
+            //     <h4>Insurance Application Summary</h4>
+            //     <p><strong>Farmer Name:</strong> ${farmerName}</p>
+            //     <p><strong>Crop Type:</strong> ${cropType}</p>
+            //     <p><strong>Acreage:</strong> ${acreage}</p>
+            //     <p><strong>Insurance Package:</strong> ${insurancePackage}</p>
+            //     <p><strong>Premium Type:</strong> ${premiumType}</p>
+            //     <p><strong>Total Premium:</strong> KES ${totalPremium.toFixed(2)}</p>
+            // `;
+
+            const insuranceData = {
+                policyNumber: 'CIP-' + Math.floor(Math.random() * 1000000),
+                farmerName: farmerName,
+                cropType: cropType,
+                acreage: acreage,
+                insurancePackage: insurancePackage,
+                premiumType: premiumType,
+                totalPremium: totalPremium,
+                startDate: new Date().toLocaleDateString(),
+                endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toLocaleDateString(),
+                transactionDate: new Date().toLocaleString(),
+                status: 'Active'
+            };
+
+            let insurances = JSON.parse(localStorage.getItem('insurances')) || [];
+            insurances.push(insuranceData);
+            localStorage.setItem('insurances', JSON.stringify(insurances));
+
+
             const insuranceDetails = document.getElementById('insuranceDetails');
             insuranceDetails.innerHTML = `
                 <h4>Insurance Application Summary</h4>
-                <p><strong>Farmer Name:</strong> ${farmerName}</p>
-                <p><strong>Crop Type:</strong> ${cropType}</p>
-                <p><strong>Acreage:</strong> ${acreage}</p>
-                <p><strong>Insurance Package:</strong> ${insurancePackage}</p>
-                <p><strong>Premium Type:</strong> ${premiumType}</p>
-                <p><strong>Total Premium:</strong> KES ${totalPremium.toFixed(2)}</p>
+                <p><strong>Policy Number:</strong> ${insuranceData.policyNumber}</p>
+                <p><strong>Farmer Name:</strong> ${insuranceData.farmerName}</p>
+                <p><strong>Crop Type:</strong> ${insuranceData.cropType}</p>
+                <p><strong>Acreage:</strong> ${insuranceData.acreage}</p>
+                <p><strong>Insurance Package:</strong> ${insuranceData.insurancePackage}</p>
+                <p><strong>Premium Type:</strong> ${insuranceData.premiumType}</p>
+                <p><strong>Total Premium:</strong> KES ${insuranceData.totalPremium.toFixed(2)}</p>
+                <p><strong>Start Date:</strong> ${insuranceData.startDate}</p>
+                <p><strong>End Date:</strong> ${insuranceData.endDate}</p>
+                <p><strong>Status:</strong> ${insuranceData.status}</p>
             `;
 
             // Generate and display insurance document
@@ -285,15 +322,15 @@
                     </div>
                     <h2 style="text-align: center; color: #45a049; border-bottom: 2px solid #45a049; padding-bottom: 10px;">Crop Insurance Policy</h2>
                     <div style="background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                        <p style="font-size: 18px;"><strong>Policy Number:</strong> CIP-${Math.floor(Math.random() * 1000000)}</p>
-                        <p><strong>Farmer Name:</strong> ${farmerName}</p>
-                        <p><strong>Crop Insured:</strong> ${cropType}</p>
-                        <p><strong>Insured Acreage:</strong> ${acreage}</p>
-                        <p><strong>Insurance Package:</strong> ${insurancePackage}</p>
-                        <p><strong>Premium Type:</strong> ${premiumType}</p>
-                        <p><strong>Total Premium:</strong> KES ${totalPremium.toFixed(2)}</p>
-                        <p><strong>Policy Start Date:</strong> ${new Date().toLocaleDateString()}</p>
-                        <p><strong>Policy End Date:</strong> ${new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toLocaleDateString()}</p>
+                        <p style="font-size: 18px;"><strong>Policy Number:</strong> ${insuranceData.policyNumber}</p>
+                        <p><strong>Farmer Name:</strong> ${insuranceData.farmerName}</p>
+                        <p><strong>Crop Insured:</strong> ${insuranceData.cropType}</p>
+                        <p><strong>Insured Acreage:</strong> ${insuranceData.acreage}</p>
+                        <p><strong>Insurance Package:</strong> ${insuranceData.insurancePackage}</p>
+                        <p><strong>Premium Type:</strong> ${insuranceData.premiumType}</p>
+                        <p><strong>Total Premium:</strong> KES ${insuranceData.totalPremium.toFixed(2)}</p>
+                        <p><strong>Policy Start Date:</strong> ${insuranceData.startDate}</p>
+                        <p><strong>Policy End Date:</strong> ${insuranceData.endDate}</p>
                     </div>
                     <div style="margin-top: 20px; padding: 15px; background-color: #e8f5e9; border-radius: 10px;">
                         <p style="font-style: italic; color: #2e7d32;">This document certifies that the above-mentioned farmer is insured under our Crop Insurance Program, subject to the terms and conditions of the policy.</p>
@@ -306,12 +343,13 @@
                 </div>
             `;
 
+
             document.getElementById('insuranceDocument').style.display = 'block';
+            alert('Insurance application submitted successfully!');
         });
 
-        // Print functionality
-       // Print functionality
-       document.getElementById('printButton').addEventListener('click', function() {
+             // Print functionality
+             document.getElementById('printButton').addEventListener('click', function() {
             const printContent = document.getElementById('documentContent').innerHTML;
             const originalContent = document.body.innerHTML;
             document.body.innerHTML = printContent;

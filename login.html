@@ -294,6 +294,8 @@
             alert('Sign up successful!');
             window.location.href = 'home.html';
         });
+
+        localStorage.setItem('currentUser', JSON.stringify(userData));
     </script>
 </body>
 </html>

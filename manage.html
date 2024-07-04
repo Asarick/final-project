@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -196,7 +196,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Insurance data will be populated here -->
+                        
                     </tbody>
                 </table>
             </div>
@@ -212,7 +212,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Market bookings data will be populated here -->
+                       
                     </tbody>
                 </table>
             </div>
@@ -257,18 +257,27 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Function to get user data from localStorage
+        // Function to check if user is logged in
+        function checkLoggedInUser() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser || !currentUser.email) {
+                window.location.href = 'index.html'; // Redirect to login page if not logged in
+            }
+        }
+
+       
         function getUserData() {
             return JSON.parse(localStorage.getItem('currentUser')) || {};
         }
 
-        // Function to update user data in localStorage
+        
         function updateUserData(data) {
             localStorage.setItem('currentUser', JSON.stringify(data));
         }
 
-        // Function to populate form with user data
+        
         function populateForm() {
             const userData = getUserData();
             document.getElementById('name').value = userData.name || '';
@@ -278,7 +287,7 @@
             document.getElementById('farmSize').value = userData.farmSize || '';
         }
 
-        // Function to handle form submission
+        
         function handleFormSubmit(e) {
             e.preventDefault();
             const userData = {
@@ -292,9 +301,10 @@
             alert('Account updated successfully!');
         }
 
-        // Function to populate insurance table
+        
         function populateInsuranceTable() {
-            const insurances = JSON.parse(localStorage.getItem('insurances')) || [];
+            const userEmail = getUserData().email;
+            const insurances = JSON.parse(localStorage.getItem(`insurances_${userEmail}`)) || [];
             const tableBody = document.querySelector('#insuranceTable tbody');
             tableBody.innerHTML = '';
             insurances.forEach(insurance => {
@@ -314,47 +324,44 @@
             });
         }
 
-        // Add this function to the existing script in manage.html
-
-        // Function to populate market bookings table
+        
         function populateMarketBookingsTable() {
-            const marketBookings = JSON.parse(localStorage.getItem('marketBookings')) || [];
+            const userEmail = getUserData().email;
+            const marketBookings = JSON.parse(localStorage.getItem(`marketBookings_${userEmail}`)) || [];
             const tableBody = document.querySelector('#marketBookingsTable tbody');
             tableBody.innerHTML = '';
             marketBookings.forEach(booking => {
                 const row = tableBody.insertRow();
                 row.innerHTML = `
-            <td>${booking.marketName}</td>
-            <td>${booking.sellingDate}</td>
-            <td>${booking.specialRequirements || 'None'}</td>
-            <td>${new Date(booking.bookingDate).toLocaleString()}</td>
-        `;
+                    <td>${booking.marketName}</td>
+                    <td>${booking.sellingDate}</td>
+                    <td>${booking.specialRequirements || 'None'}</td>
+                    <td>${new Date(booking.bookingDate).toLocaleString()}</td>
+                `;
             });
         }
 
-        // Update the existing DOMContentLoaded event listener
+        
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        
         document.addEventListener('DOMContentLoaded', function () {
+            checkLoggedInUser();
             populateForm();
             populateInsuranceTable();
-            populateMarketBookingsTable(); // Add this line
+            populateMarketBookingsTable();
             document.getElementById('accountForm').addEventListener('submit', handleFormSubmit);
         });
 
-        // Optional: Add a function to clear market bookings (for testing purposes)
-        function clearMarketBookings() {
-            localStorage.removeItem('marketBookings');
-            populateMarketBookingsTable();
-            alert('Market bookings cleared');
-        }
-
-
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', function () {
-            populateForm();
-            populateInsuranceTable();
-            document.getElementById('accountForm').addEventListener('submit', handleFormSubmit);
+        
+        document.querySelector('a[href="index.html"]').addEventListener('click', function(e) {
+            e.preventDefault();
+            logout();
         });
     </script>
 </body>
 
-</html>
+</html> -->

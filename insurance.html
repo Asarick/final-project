@@ -196,14 +196,16 @@
                         <div class="card-body">
                             <div id="insuranceDetails"></div>
                             <div id="paymentSection" style="display: none;">
-                                <h4 class="mt-4">Payment Details</h4>
-                                <form id="payment-form">
-                                    <div id="card-element" class="form-control mb-3">
-                                        <!-- A Stripe Element will be inserted here. -->
+                                <h4 class="mt-4">M-Pesa Payment</h4>
+                                <form id="mpesa-payment-form">
+                                    <div class="mb-3">
+                                        <label for="phone-number" class="form-label">M-Pesa Phone Number</label>
+                                        <input type="tel" class="form-control" id="phone-number"
+                                            placeholder="254XXXXXXXXX" required>
                                     </div>
-                                    <div id="card-errors" role="alert" class="text-danger mb-3"></div>
-                                    <button id="submit-payment" class="btn btn-success">Pay Premium</button>
+                                    <button id="submit-payment" class="btn btn-success">Pay with M-Pesa</button>
                                 </form>
+                                <div id="payment-status" class="mt-3"></div>
                             </div>
                             <div id="insuranceDocument" class="mt-4">
                                 <h4>Insurance Document</h4>
@@ -255,7 +257,6 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://js.stripe.com/v3/"></script>
     <script>
         // Function to get greeting based on time of day
         function getGreeting() {
@@ -330,59 +331,55 @@
             `;
 
             document.getElementById('paymentSection').style.display = 'block';
-            document.getElementById('submit-payment').textContent = `Pay KES ${insuranceData.totalPremium.toFixed(2)}`;
+            document.getElementById('submit-payment').textContent = `Pay KES ${insuranceData.totalPremium.toFixed(2)} with M-Pesa`;
         });
 
-        // Stripe payment integration
-        const stripe = Stripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
-        const elements = stripe.elements();
+        // M-Pesa payment integration
+        // M-Pesa payment integration
+        document.getElementById('mpesa-payment-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const phoneNumber = document.getElementById('phone-number').value;
+            const paymentStatus = document.getElementById('payment-status');
 
-        const card = elements.create('card');
-        card.mount('#card-element');
-
-        card.addEventListener('change', function (event) {
-            var displayError = document.getElementById('card-errors');
-            if (event.error) {
-                displayError.textContent = event.error.message;
-            } else {
-                displayError.textContent = '';
-            }
-        });
-
-        const form = document.getElementById('payment-form');
-        form.addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            stripe.createToken(card).then(function (result) {
-                if (result.error) {
-                    var errorElement = document.getElementById('card-errors');
-                    errorElement.textContent = result.error.message;
-                } else {
-                    stripeTokenHandler(result.token);
-                }
-            });
-        });
-
-        function stripeTokenHandler(token) {
-            // Here you would normally send the token to your server
-            console.log('Payment processed with token:', token.id);
-
-            // Update the insurance status
+            // Get the last insurance entry
             let insurances = JSON.parse(localStorage.getItem('insurances')) || [];
             let lastInsurance = insurances[insurances.length - 1];
-            lastInsurance.status = 'Active';
-            localStorage.setItem('insurances', JSON.stringify(insurances));
 
-            // Update the insurance details display
-            const insuranceDetails = document.getElementById('insuranceDetails');
-            insuranceDetails.innerHTML = insuranceDetails.innerHTML.replace('Pending Payment', 'Active');
+            // Simulate M-Pesa API call
+            paymentStatus.textContent = "Processing payment...";
 
-            // Hide payment section and show insurance document
-            document.getElementById('paymentSection').style.display = 'none';
-            generateInsuranceDocument(lastInsurance);
-        }
+            // M-Pesa API Authentication
+            let headers = new Headers();
+            headers.append("Authorization", "Basic T1pzRHZqNUtWR25RTFVFS1J1ekNCMkJLMmN4NTJJMG9sVUdYU2Y3QmRBckhhVkFMOjdLcFc4cEh4dWkzV25YRkZ0ZzZ3VTVvWUpWSWIxZnloSXhmOUd4bmV4UkNwZXVaQjFXYXA4aUtzWEZpR09JMlM=");
 
-        
+            fetch("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", { headers })
+                .then(response => response.json())  // Changed from response.text() to response.json()
+                .then(result => {
+                    console.log(result);
+                    // Here you would use the access token from the result to make further M-Pesa API calls
+                    // For this example, we'll just simulate a successful payment after a delay
+                    setTimeout(() => {
+                        // Simulating a successful payment
+                        paymentStatus.textContent = "Payment successful! Check your phone for M-Pesa confirmation.";
+
+                        // Update the insurance status
+                        lastInsurance.status = 'Active';
+                        localStorage.setItem('insurances', JSON.stringify(insurances));
+
+                        // Update the insurance details display
+                        const insuranceDetails = document.getElementById('insuranceDetails');
+                        insuranceDetails.innerHTML = insuranceDetails.innerHTML.replace('Pending Payment', 'Active');
+
+                        // Hide payment section and show insurance document
+                        document.getElementById('paymentSection').style.display = 'none';
+                        generateInsuranceDocument(lastInsurance);
+                    }, 3000); // Simulating a 3-second process
+                })
+                .catch(error => {
+                    console.log(error);
+                    paymentStatus.textContent = "Payment processing failed. Please try again.";
+                });
+        });
 
         function generateInsuranceDocument(insuranceData) {
             const documentContent = document.getElementById('documentContent');
@@ -414,7 +411,7 @@
                     <p>Phone: +254 123 456 789 | Email: support@agriconnect.com</p>
                 </div>
             </div>
-        `;
+            `;
             document.getElementById('insuranceDocument').style.display = 'block';
         }
 

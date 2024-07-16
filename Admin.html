@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriConnect Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f1f8e9;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .navbar {
+            background-color: #4caf50;
+        }
+
+        .navbar-brand, .nav-link {
+            color: white !important;
+        }
+
+        .main-content {
+            padding-top: 60px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background-color: #4caf50;
+            color: white;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
+
+        .btn-success {
+            background-color: #4caf50;
+            border: none;
+        }
+
+        .btn-success:hover {
+            background-color: #45a049;
+        }
+
+        .admin-section {
+            background-color: #e8f5e9;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .admin-section h5 {
+            color: #4caf50;
+            margin-bottom: 15px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">AgriConnect Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="account-requests">Account Requests</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="market-management">Market Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="resource-management">Resource Management</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <div id="dashboardPage" class="page">
+            <h2 class="text-center mb-4">Dashboard</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Pending Account Requests</h5>
+                            <p class="card-text" id="pendingAccountsCount">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Pending Market Bookings</h5>
+                            <p class="card-text" id="pendingBookingsCount">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Blog Posts</h5>
+                            <p class="card-text" id="totalBlogPosts">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="account-requestsPage" class="page">
+            <section class="admin-section">
+                <h5>Account Requests</h5>
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>User Type</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="signupRequestsTable">
+                                <!-- Signup requests will be dynamically added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div id="market-managementPage" class="page">
+            <section class="admin-section">
+                <h5>Market Management</h5>
+                <div class="card">
+                    <div class="card-body">
+                        <h6>Update Market Prices</h6>
+                        <form id="updatePricesForm">
+                            <div class="mb-3">
+                                <label for="cropSelect" class="form-label">Select Crop</label>
+                                <select class="form-select" id="cropSelect">
+                                    <!-- Crop options will be dynamically added here -->
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="newPrice" class="form-label">New Price (KES per kg)</label>
+                                <input type="number" class="form-control" id="newPrice" required>
+                            </div>
+                            <button type="submit" class="btn btn-success">Update Price</button>
+                        </form>
+
+                        <h6 class="mt-4">Market Space Bookings</h6>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Farmer</th>
+                                    <th>Market</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="marketBookingsTable">
+                                <!-- Market bookings will be dynamically added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div id="resource-managementPage" class="page">
+            <section class="admin-section">
+                <h5>Resource Management</h5>
+                <div class="card">
+                    <div class="card-body">
+                        <h6>Add New Blog Post</h6>
+                        <form id="addBlogForm">
+                            <div class="mb-3">
+                                <label for="blogTitle" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="blogTitle" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="blogExcerpt" class="form-label">Excerpt</label>
+                                <textarea class="form-control" id="blogExcerpt" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success">Add Blog Post</button>
+                        </form>
+
+                        <h6 class="mt-4">Add New Farming Tip</h6>
+                        <form id="addTipForm">
+                            <div class="mb-3">
+                                <label for="farmingTip" class="form-label">Tip</label>
+                                <textarea class="form-control" id="farmingTip" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success">Add Farming Tip</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let accountRequests = [
+            { name: "John Doe", email: "john@example.com", date: "2024-07-08" },
+            { name: "Jane Smith", email: "jane@example.com", date: "2024-07-09" }
+        ];
+
+        let marketBookings = [
+            { farmer: "John Doe", market: "Central Market", date: "2024-07-15" },
+            { farmer: "Jane Smith", market: "Green Valley Market", date: "2024-07-16" }
+        ];
+
+        let crops = ['Maize', 'Wheat', 'Rice', 'Potatoes', 'Tomatoes', 'Onions', 'Cabbage', 'Carrots'];
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId + 'Page').classList.add('active');
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            document.querySelector(`.nav-link[data-page="${pageId}"]`).classList.add('active');
+        }
+
+        function loadSignupRequests() {
+            const signupRequests = JSON.parse(localStorage.getItem('signupRequests') || '[]');
+            const tableBody = document.getElementById('signupRequestsTable');
+            tableBody.innerHTML = '';
+
+            signupRequests.forEach((request, index) => {
+                if (request.status === 'pending') {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${request.name}</td>
+                        <td>${request.email}</td>
+                        <td>${request.userType}</td>
+                        <td>
+                            <button class="btn btn-sm btn-success approve-btn" data-index="${index}">Approve</button>
+                            <button class="btn btn-sm btn-danger deny-btn" data-index="${index}">Deny</button>
+                        </td>
+                    `;
+                }
+            });
+
+            // Update dashboard count
+            document.getElementById('pendingAccountsCount').textContent = signupRequests.filter(r => r.status === 'pending').length + ' pending requests';
+        }
+
+        function populateMarketBookings() {
+            const tableBody = document.getElementById('marketBookingsTable');
+            tableBody.innerHTML = '';
+            marketBookings.forEach(booking => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${booking.farmer}</td>
+                    <td>${booking.market}</td>
+                    <td>${booking.date}</td>
+                    <td>
+                        <button class="btn btn-sm btn-success approve-booking-btn">Approve</button>
+                        <button class="btn btn-sm btn-danger deny-booking-btn">Deny</button>
+                    </td>
+                `;
+            });
+
+            // Update dashboard count
+            document.getElementById('pendingBookingsCount').textContent = marketBookings.length + ' pending bookings';
+        }
+
+        function populateCropSelect() {
+            const select = document.getElementById('cropSelect');
+            select.innerHTML = '';
+            crops.forEach(crop => {
+                const option = document.createElement('option');
+                option.value = crop;
+                option.textContent = crop;
+                select.appendChild(option);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add event listeners for navbar links
+            document.querySelectorAll('.nav-link[data-page]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showPage(this.dataset.page);
+                });
+            });
+
+            loadSignupRequests();
+            populateMarketBookings();
+            populateCropSelect();
+
+            // Set initial blog post count (you might want to replace this with actual data)
+            document.getElementById('totalBlogPosts').textContent = '5 blog posts';
+
+            document.getElementById('signupRequestsTable').addEventListener('click', function (e) {
+                if (e.target.classList.contains('approve-btn') || e.target.classList.contains('deny-btn')) {
+                    const index = e.target.getAttribute('data-index');
+                    const action = e.target.classList.contains('approve-btn') ? 'approve' : 'deny';
+                    handleSignupRequest(index, action);
+                }
+            });
+
+            document.getElementById('marketBookingsTable').addEventListener('click', function (e) {
+                if (e.target.classList.contains('approve-booking-btn') || e.target.classList.contains('deny-booking-btn')) {
+                    const action = e.target.classList.contains('approve-booking-btn') ? 'approved' : 'denied';
+                    const row = e.target.closest('tr');
+                    const farmer = row.cells[0].textContent;
+                    const date = row.cells[2].textContent;
+                    alert(`Market booking ${action}. Notification sent to farmer.`);
+                    marketBookings = marketBookings.filter(booking => booking.farmer !== farmer || booking.date !== date);
+                    populateMarketBookings();
+                }
+            });
+
+            document.getElementById('updatePricesForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const crop = document.getElementById('cropSelect').value;
+                const newPrice = document.getElementById('newPrice').value;
+                alert(`Price updated for ${crop}: KES ${newPrice} per kg`);
+                this.reset();
+            });
+
+            document.getElementById('addBlogForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const title = document.getElementById('blogTitle').value;
+                const excerpt = document.getElementById('blogExcerpt').value;
+                alert(`New blog post added: "${title}"`);
+                this.reset();
+                // Update blog post count (you might want to replace this with actual data management)
+                const currentCount = parseInt(document.getElementById('totalBlogPosts').textContent);
+                document.getElementById('totalBlogPosts').textContent = (currentCount + 1) + ' blog posts';
+            });
+
+            document.getElementById('addTipForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const tip = document.getElementById('farmingTip').value;
+                alert('New farming tip added');
+                this.reset();
+            });
+
+            // Show dashboard by default
+            showPage('dashboard');
+        });
+
+        function handleSignupRequest(index, action) {
+            const signupRequests = JSON.parse(localStorage.getItem('signupRequests') || '[]');
+            const request = signupRequests[index];
+
+            if (action === 'approve') {
+                request.status = 'approved';
+                alert(`Account approved for ${request.email}`);
+            } else {
+                request.status = 'denied';
+                alert(`Account denied for ${request.email}`);
+            }
+
+            signupRequests[index] = request;
+            localStorage.setItem('signupRequests', JSON.stringify(signupRequests));
+            loadSignupRequests();
+        }
+
+        // Simulating new signup requests
+        function simulateNewSignupRequest() {
+            const names = ['Alice Johnson', 'Bob Williams', 'Carol Davis', 'David Brown'];
+            const userTypes = ['Farmer', 'Buyer', 'Supplier'];
+            
+            const newRequest = {
+                name: names[Math.floor(Math.random() * names.length)],
+                email: `user${Math.floor(Math.random() * 1000)}@example.com`,
+                userType: userTypes[Math.floor(Math.random() * userTypes.length)],
+                status: 'pending',
+                date: new Date().toISOString().split('T')[0]
+            };
+
+            const signupRequests = JSON.parse(localStorage.getItem('signupRequests') || '[]');
+            signupRequests.push(newRequest);
+            localStorage.setItem('signupRequests', JSON.stringify(signupRequests));
+            loadSignupRequests();
+        }
+
+        // Simulate new signup requests every 30 seconds
+        setInterval(simulateNewSignupRequest, 30000);
+
+        // Initial simulation
+        simulateNewSignupRequest();
+    </script>
+</body>
+</html>
